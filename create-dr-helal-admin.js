@@ -91,7 +91,7 @@ async function createDrHelalAdmin() {
     console.log('   - Password: 123456');
     
     console.log('\\n🌐 You can now login at:');
-    console.log('   - Doctor Portal: https://portal.drganeshcs.com');
+    console.log('   - Doctor Portal: https://drhelal-server.vercel.app');
     console.log('   - Local Development: http://localhost:5173 (if running locally)');
 
     // Also count total users

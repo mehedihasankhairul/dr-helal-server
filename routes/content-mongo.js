@@ -156,11 +156,11 @@ router.post('/', authenticateToken, requireRole(['admin', 'doctor']), validateCo
     // Handle demo doctor - create a dummy User record if needed
     if (req.user.id === 'demo-doctor-id') {
       // Check if demo user exists, create if not
-      let demoUser = await User.findOne({ email: 'doctor@drganeshcs.com' });
+      let demoUser = await User.findOne({ email: 'doctor@drhelal.com' });
       if (!demoUser) {
         demoUser = new User({
-          email: 'doctor@drganeshcs.com',
-          full_name: 'Dr. Ganesh',
+          email: 'doctor@drhelal.com',
+          full_name: 'Dr. Helal',
           role: 'doctor',
           password_hash: await User.hashPassword('temp123'), // temporary password
           is_demo: true

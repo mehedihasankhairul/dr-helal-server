@@ -42,11 +42,11 @@ app.use('/api/', limiter);
 // CORS configuration for main domain and portal subdomain
 const allowedOrigins = [
   process.env.CLIENT_URL || 'http://localhost:5173', // Local development
-  process.env.MAIN_DOMAIN || 'https://drganeshcs.com', // Main domain from env
-  'https://www.drganeshcs.com', // Main domain with www
-  process.env.PORTAL_DOMAIN || 'https://portal.drganeshcs.com', // Portal subdomain from env
-  'https://portal.drganeshcs.com', // Portal subdomain (hardcoded backup)
-  'https://drganeshcs.com', // Main domain (hardcoded backup)
+  process.env.MAIN_DOMAIN || 'https://drhelal-server.vercel.app', // Main domain from env
+  'https://www.drhelal-server.vercel.app', // Main domain with www
+  process.env.PORTAL_DOMAIN || 'https://drhelal-server.vercel.app', // Portal subdomain from env
+  'https://drhelal-server.vercel.app', // Portal subdomain (hardcoded backup)
+  'https://drhelal-server.vercel.app', // Main domain (hardcoded backup)
   'http://localhost:3000', // Alternative local port
   'http://localhost:5174', // Alternative local port
   'http://localhost:5173', // Vite default port

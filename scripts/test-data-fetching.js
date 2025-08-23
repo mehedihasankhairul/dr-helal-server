@@ -59,8 +59,8 @@ async function testDataFetching() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'admin@drganeshcs.com',
-        password: 'ganeshcs123',
+        email: 'admin@drhelal.com',
+        password: 'drhelal123',
         loginType: 'email'
       })
     });

@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 // Load environment variables
 dotenv.config();
 
-const PRODUCTION_API_URL = 'https://api.drganeshcs.com/api';
+const PRODUCTION_API_URL = 'https://drhelal-server.vercel.app/api';
 const LOCAL_API_URL = 'http://localhost:3001/api';
 
 async function testContentUpload() {
@@ -63,8 +63,8 @@ async function testContentUpload() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'admin@drganeshcs.com',
-          password: 'ganeshcs123',
+          email: 'admin@drhelal.com',
+          password: 'drhelal123',
           loginType: 'email'
         })
       });

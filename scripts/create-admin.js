@@ -17,9 +17,9 @@ async function createAdminUser() {
 
     // Admin user credentials
     const adminData = {
-      email: 'admin@drganeshcs.com',
-      password: 'ganeshcs123',
-      full_name: 'Dr. Ganesh Admin',
+      email: 'admin@drhelal.com',
+      password: 'drhelal123',
+      full_name: 'Dr. Helal Admin',
       role: 'admin',
       phone: '+91-9876543210',
       gender: 'male',
@@ -79,11 +79,11 @@ async function createAdminUser() {
     console.log('   - Created:', admin.createdAt);
     
     console.log('\n🔑 Login Credentials:');
-    console.log('   - Email: admin@drganeshcs.com');
-    console.log('   - Password: ganeshcs123');
+    console.log('   - Email: admin@drhelal.com');
+    console.log('   - Password: drhelal123');
     
     console.log('\n🌐 You can now login at:');
-    console.log('   - Doctor Portal: https://portal.drganeshcs.com');
+    console.log('   - Doctor Portal: https://drhelal-server.vercel.app');
     console.log('   - Local Portal: http://localhost:5173 (switch to doctor portal)');
 
   } catch (error) {

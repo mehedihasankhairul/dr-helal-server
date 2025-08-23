@@ -239,8 +239,8 @@ const HOSPITAL_SCHEDULES = {
 ```javascript
 const allowedOrigins = [
   'http://localhost:5173',         // Vite development
-  'https://portal.drganeshcs.com', // Production portal
-  'https://drganeshcs.com',        // Main domain
+  'https://drhelal-server.vercel.app', // Production portal
+  'https://drhelal-server.vercel.app',        // Main domain
   // Development regex for localhost
 ];
 ```

@@ -5,8 +5,8 @@
 An admin user has been successfully created in your Eye Appointment system with the following credentials:
 
 ### 🔑 Login Credentials
-- **Email**: `admin@drganeshcs.com`
-- **Password**: `ganeshcs123`
+- **Email**: `admin@drhelal.com`
+- **Password**: `drhelal123`
 - **Role**: `admin`
 
 ### 👤 User Details
@@ -20,7 +20,7 @@ An admin user has been successfully created in your Eye Appointment system with 
 ## 🌐 How to Login
 
 ### Option 1: Doctor Portal (Recommended)
-1. Visit: https://portal.drganeshcs.com
+1. Visit: https://drhelal-server.vercel.app
 2. Click on "Doctor Portal" or navigate to the doctor login section
 3. Choose "Email/Password" login type
 4. Enter the credentials above
@@ -132,7 +132,7 @@ The following npm scripts have been added to `package.json`:
 ### Common Issues
 
 1. **"Invalid credentials" error**
-   - Verify the email and password are exactly: `admin@drganeshcs.com` / `ganeshcs123`
+   - Verify the email and password are exactly: `admin@drhelal.com` / `drhelal123`
    - Ensure the database connection is working
    - Check server logs for detailed error information
 

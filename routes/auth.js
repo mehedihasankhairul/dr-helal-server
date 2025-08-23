@@ -64,8 +64,8 @@ router.post('/register', validateRegistration, async (req, res) => {
 const DOCTOR_PINS = {
   '123456': {
     id: 'demo-doctor-id',
-    name: 'Dr. Ganesh',
-    email: 'doctor@drganeshcs.com',
+    name: 'Dr. Helal',
+    email: 'doctor@drhelal.com',
     role: 'doctor',
     specialization: 'Cardiology & Medicine'
   }
@@ -97,20 +97,20 @@ router.post('/doctor-login', async (req, res) => {
       }
       
       // Check hardcoded credentials first for immediate access
-      if (email === 'doctor@drganeshcs.com' && password === 'DrGanesh2024!') {
+      if (email === 'doctor@drhelal.com' && password === 'DrHelal2024!') {
         user = {
           id: 'demo-doctor-id',
-          name: 'Dr. Ganesh',
-          email: 'doctor@drganeshcs.com',
+          name: 'Dr. Helal',
+          email: 'doctor@drhelal.com',
           role: 'doctor',
           specialization: 'Cardiology & Medicine'
         };
-      } else if (email === 'admin@drganeshcs.com' && password === 'ganeshcs123') {
+      } else if (email === 'admin@drhelal.com' && password === 'drhelal123') {
         // Hardcoded admin credentials using real database ID
         user = {
           id: '68939ff5a66552100667ebdd', // Real database ID
-          name: 'Dr. Ganesh Admin',
-          email: 'admin@drganeshcs.com',
+          name: 'Dr. Helal Admin',
+          email: 'admin@drhelal.com',
           role: 'admin',
           specialization: 'Administrator'
         };

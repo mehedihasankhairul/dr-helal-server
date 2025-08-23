@@ -19,9 +19,9 @@ async function createAdminUserProduction() {
 
     // Admin user credentials
     const adminData = {
-      email: 'admin@drganeshcs.com',
-      password: 'ganeshcs123',
-      full_name: 'Dr. Ganesh Admin',
+      email: 'admin@drhelal.com',
+      password: 'drhelal123',
+      full_name: 'Dr. Helal Admin',
       role: 'admin',
       phone: '+91-9876543210',
       gender: 'male',
@@ -84,12 +84,12 @@ async function createAdminUserProduction() {
     console.log('   - Updated:', admin.updatedAt);
     
     console.log('\n🔑 Production Login Credentials:');
-    console.log('   - Email: admin@drganeshcs.com');
-    console.log('   - Password: ganeshcs123');
+    console.log('   - Email: admin@drhelal.com');
+    console.log('   - Password: drhelal123');
     
     console.log('\n🌐 You can now login at:');
-    console.log('   - Production Portal: https://portal.drganeshcs.com');
-    console.log('   - Main Website: https://drganeshcs.com (doctor portal)');
+    console.log('   - Production Portal: https://drhelal-server.vercel.app');
+    console.log('   - Main Website: https://drhelal-server.vercel.app (doctor portal)');
     
     console.log('\n🧪 Testing production API...');
     // We could test the API here, but we'll do it separately

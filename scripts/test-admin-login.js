@@ -12,8 +12,8 @@ async function testAdminLogin() {
     
     // Test admin login credentials
     const loginData = {
-      email: 'admin@drganeshcs.com',
-      password: 'ganeshcs123',
+      email: 'admin@drhelal.com',
+      password: 'drhelal123',
       loginType: 'email'
     };
 
