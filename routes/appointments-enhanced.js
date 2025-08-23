@@ -33,10 +33,19 @@ router.post('/', async (req, res) => {
         // Use date or appointment_date (frontend might send either)
         const dateToCheck = date || appointment_date;
         
-        // Check if the appointment is for Friday
+        // Check hospital-specific Friday restrictions
         const appointmentDateObj = dayjs(dateToCheck);
         if (appointmentDateObj.day() === 5) {
-            return res.status(400).json({ error: 'Both hospitals are closed on Fridays' });
+            // Only Gomoti Hospital is closed on Fridays
+            // Al-Sefa Hospital is OPEN on Fridays
+            const hospitalName = hospital.toLowerCase();
+            if (hospitalName.includes('gomoti') || hospitalName.includes('moon')) {
+                return res.status(400).json({ 
+                    error: `${hospital} is closed on Fridays`,
+                    message: 'Please select a different date or try Al-Sefa Hospital which is open on Fridays'
+                });
+            }
+            // Al-Sefa Hospital is allowed on Fridays - continue processing
         }
         
         // Start transaction for atomic operation
@@ -294,20 +303,39 @@ router.get('/track/:refNumber', async (req, res) => {
             return res.status(404).json({ error: 'Appointment not found with this reference number' });
         }
         
-        // Return limited information for privacy
+        // Return comprehensive appointment information
         const appointmentInfo = {
+            // Basic appointment details
+            id: appointment._id.toString(),
             reference_number: appointment.reference_number,
-            patient_name: appointment.patient_name,
+            status: appointment.status || 'pending',
+            
+            // Date and time information
             appointment_date: appointment.appointment_date,
             appointment_time: appointment.appointment_time,
+            
+            // Hospital and doctor info
             hospital: appointment.hospital,
-            status: appointment.status || 'pending',
-            doctor_name: appointment.doctor_name,
+            doctor_name: appointment.doctor_name || 'Dr. Helal Uddin',
+            
+            // Patient information
+            patient_name: appointment.patient_name,
+            patient_email: appointment.patient_email,
+            patient_phone: appointment.patient_phone,
+            patient_age: appointment.patient_age,
+            patient_gender: appointment.gender, // Note the field name in schema
+            patient_address: appointment.address || 'Not provided',
+            problem_description: appointment.symptoms || appointment.problemDescription,
+            
+            // Visit information
             visit_completed: appointment.visit_completed || false,
             visit_summary: appointment.visit_summary,
             follow_up_required: appointment.follow_up_required || false,
-            created_at: appointment.created_at,
-            updated_at: appointment.updated_at
+            doctor_notes: appointment.notes,
+            
+            // Timestamps
+            created_at: appointment.created_at || appointment.createdAt,
+            updated_at: appointment.updated_at || appointment.updatedAt
         };
         
         // Check for prescription
@@ -317,6 +345,7 @@ router.get('/track/:refNumber', async (req, res) => {
             if (prescription) {
                 appointmentInfo.has_prescription = true;
                 appointmentInfo.prescription_reference = prescription.reference_number;
+                appointmentInfo.prescription_date = prescription.created_at;
             } else {
                 appointmentInfo.has_prescription = false;
             }
@@ -324,10 +353,120 @@ router.get('/track/:refNumber', async (req, res) => {
             appointmentInfo.has_prescription = false;
         }
         
-        res.json({ appointment: appointmentInfo });
+        // Add reference for frontend - copy fields to alternative names for flexible frontend handling
+        appointmentInfo.patientName = appointment.patient_name;
+        appointmentInfo.patientEmail = appointment.patient_email;
+        appointmentInfo.patientPhone = appointment.patient_phone;
+        appointmentInfo.patientAge = appointment.patient_age;
+        appointmentInfo.patientGender = appointment.gender;
+        appointmentInfo.problemDescription = appointment.symptoms || appointment.problemDescription;
+        appointmentInfo.date = appointment.appointment_date;
+        appointmentInfo.time = appointment.appointment_time;
+        
+        res.json({
+            success: true,
+            message: 'Appointment found',
+            appointment: appointmentInfo
+        });
     } catch (error) {
         console.error('Track appointment error:', error);
-        res.status(500).json({ error: 'Failed to track appointment' });
+        res.status(500).json({
+            success: false,
+            error: 'Failed to track appointment',
+            message: 'An error occurred while retrieving appointment information'
+        });
+    }
+});
+
+// Additional endpoint for appointment reference lookup with the same response format
+router.get('/reference/:refNumber', async (req, res) => {
+    try {
+        const { refNumber } = req.params;
+        
+        // Find appointment by reference number
+        const appointmentsCollection = getCollection('appointments');
+        const appointment = await appointmentsCollection.findOne({ reference_number: refNumber });
+        
+        if (!appointment) {
+            return res.status(404).json({
+                success: false,
+                error: 'Appointment not found',
+                message: 'No appointment found with this reference number'
+            });
+        }
+        
+        // Return comprehensive appointment information
+        const appointmentInfo = {
+            // Basic appointment details
+            id: appointment._id.toString(),
+            reference_number: appointment.reference_number,
+            status: appointment.status || 'pending',
+            
+            // Date and time information
+            appointment_date: appointment.appointment_date,
+            appointment_time: appointment.appointment_time,
+            
+            // Hospital and doctor info
+            hospital: appointment.hospital,
+            doctor_name: appointment.doctor_name || 'Dr. Helal Uddin',
+            
+            // Patient information
+            patient_name: appointment.patient_name,
+            patient_email: appointment.patient_email,
+            patient_phone: appointment.patient_phone,
+            patient_age: appointment.patient_age,
+            patient_gender: appointment.gender, // Note the field name in schema
+            patient_address: appointment.address || 'Not provided',
+            problem_description: appointment.symptoms || appointment.problemDescription,
+            
+            // Visit information
+            visit_completed: appointment.visit_completed || false,
+            visit_summary: appointment.visit_summary,
+            follow_up_required: appointment.follow_up_required || false,
+            doctor_notes: appointment.notes,
+            
+            // Timestamps
+            created_at: appointment.created_at || appointment.createdAt,
+            updated_at: appointment.updated_at || appointment.updatedAt
+        };
+        
+        // Check for prescription
+        if (appointment.prescription_id) {
+            const prescriptionsCollection = getCollection('prescriptions');
+            const prescription = await prescriptionsCollection.findOne({ _id: appointment.prescription_id });
+            if (prescription) {
+                appointmentInfo.has_prescription = true;
+                appointmentInfo.prescription_reference = prescription.reference_number;
+                appointmentInfo.prescription_date = prescription.created_at;
+            } else {
+                appointmentInfo.has_prescription = false;
+            }
+        } else {
+            appointmentInfo.has_prescription = false;
+        }
+        
+        // Add reference for frontend - copy fields to alternative names for flexible frontend handling
+        appointmentInfo.patientName = appointment.patient_name;
+        appointmentInfo.patientEmail = appointment.patient_email;
+        appointmentInfo.patientPhone = appointment.patient_phone;
+        appointmentInfo.patientAge = appointment.patient_age;
+        appointmentInfo.patientGender = appointment.gender;
+        appointmentInfo.problemDescription = appointment.symptoms || appointment.problemDescription;
+        appointmentInfo.date = appointment.appointment_date;
+        appointmentInfo.time = appointment.appointment_time;
+        
+        res.json({
+            success: true,
+            message: 'Appointment found',
+            appointment: appointmentInfo
+        });
+    } catch (error) {
+        console.error('Reference appointment lookup error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to lookup appointment',
+            message: 'An error occurred while retrieving appointment information'
+        });
     }
 });
 

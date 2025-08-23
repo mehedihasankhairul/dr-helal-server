@@ -33,6 +33,14 @@ export const getDB = () => {
 
 // Get collection helper (for native MongoDB operations if needed)
 export const getCollection = (collectionName) => {
+  if (!mongoose.connection || !mongoose.connection.db) {
+    throw new Error('Database connection not established. Make sure to call connectDB() first.');
+  }
+  
+  if (mongoose.connection.readyState !== 1) {
+    throw new Error('Database connection not ready. Current state: ' + mongoose.connection.readyState);
+  }
+  
   return mongoose.connection.db.collection(collectionName);
 };
 

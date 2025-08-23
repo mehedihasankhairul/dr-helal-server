@@ -24,164 +24,180 @@ import hospitalSchedulesRoutes from './routes/hospital-schedules.js';
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
-app.use(compression());
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use('/api/', limiter);
-
-// CORS configuration for main domain and portal subdomain
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173', // Local development
-  'http://localhost:5173', // Development server
-  'https://dr-helal.vercel.app', // Client URL from external context
-  'https://www.dr-helal.vercel.app', // Client URL with www
-  process.env.MAIN_DOMAIN || 'https://drhelal-server.vercel.app', // Main domain from env
-  'https://www.drhelal-server.vercel.app', // Main domain with www
-  process.env.PORTAL_DOMAIN || 'https://drhelal-server.vercel.app', // Portal subdomain from env
-  'https://drhelal-server.vercel.app', // Portal subdomain (hardcoded backup)
-  'http://localhost:3000', // Alternative local port
-  'http://localhost:5174', // Alternative local port
-];
-
-// If in development, allow all localhost origins
-if (process.env.NODE_ENV === 'development') {
-  allowedOrigins.push(/^http:\/\/localhost:\d+$/);
-}
-
-console.log('🔧 CORS Configuration:');
-console.log('📋 Allowed Origins:', allowedOrigins);
-console.log('🌍 Environment:', process.env.NODE_ENV);
-console.log('🏥 Portal Domain:', process.env.PORTAL_DOMAIN);
-console.log('🏠 Main Domain:', process.env.MAIN_DOMAIN);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, etc.)
-    if (!origin) return callback(null, true);
+// Initialize server async function
+async function initializeServer() {
+  try {
+    // Connect to MongoDB first
+    await connectDB();
     
-    console.log(`🔍 CORS request from origin: ${origin}`);
+    console.log('🔄 Setting up routes and middleware...');
     
-    // Check if origin is in allowed list or matches regex patterns
-    const isAllowed = allowedOrigins.some(allowedOrigin => {
-      if (typeof allowedOrigin === 'string') {
-        return origin === allowedOrigin;
-      } else if (allowedOrigin instanceof RegExp) {
-        return allowedOrigin.test(origin);
-      }
-      return false;
+    // Now that DB is connected, set up routes and middleware
+
+    // Security middleware
+    app.use(helmet());
+    app.use(compression());
+
+    // Rate limiting
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100 // limit each IP to 100 requests per windowMs
+    });
+    app.use('/api/', limiter);
+
+    // CORS configuration for main domain and portal subdomain
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'http://localhost:5173', // Local development
+      'http://localhost:5173', // Development server
+      'https://dr-helal.vercel.app', // Client URL from external context
+      'https://www.dr-helal.vercel.app', // Client URL with www
+      process.env.MAIN_DOMAIN || 'https://drhelal-server.vercel.app', // Main domain from env
+      'https://www.drhelal-server.vercel.app', // Main domain with www
+      process.env.PORTAL_DOMAIN || 'https://drhelal-server.vercel.app', // Portal subdomain from env
+      'https://drhelal-server.vercel.app', // Portal subdomain (hardcoded backup)
+      'http://localhost:3000', // Alternative local port
+      'http://localhost:5174', // Alternative local port
+    ];
+
+    // If in development, allow all localhost origins
+    if (process.env.NODE_ENV === 'development') {
+      allowedOrigins.push(/^http:\/\/localhost:\d+$/);
+    }
+
+    console.log('🔧 CORS Configuration:');
+    console.log('📋 Allowed Origins:', allowedOrigins);
+    console.log('🌍 Environment:', process.env.NODE_ENV);
+    console.log('🏥 Portal Domain:', process.env.PORTAL_DOMAIN);
+    console.log('🏠 Main Domain:', process.env.MAIN_DOMAIN);
+
+    app.use(cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, etc.)
+        if (!origin) return callback(null, true);
+        
+        console.log(`🔍 CORS request from origin: ${origin}`);
+        
+        // Check if origin is in allowed list or matches regex patterns
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+          if (typeof allowedOrigin === 'string') {
+            return origin === allowedOrigin;
+          } else if (allowedOrigin instanceof RegExp) {
+            return allowedOrigin.test(origin);
+          }
+          return false;
+        });
+        
+        if (isAllowed) {
+          console.log(`✅ CORS allowed for origin: ${origin}`);
+          callback(null, true);
+        } else {
+          console.warn(`❌ CORS blocked origin: ${origin}`);
+          console.warn(`📋 Allowed origins:`, allowedOrigins);
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+      optionsSuccessStatus: 200 // For legacy browser support
+    }));
+
+    // Logging
+    app.use(morgan('combined'));
+
+    // Body parsing middleware
+    app.use(express.json({ limit: '10mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+    // Static files (for uploads)
+    app.use('/uploads', express.static('uploads'));
+
+    // API Routes
+    app.use('/api/appointments', appointmentRoutes);
+    app.use('/api/content', contentRoutes);
+    app.use('/api/contact', contactRoutes);
+    app.use('/api/reviews', reviewRoutes);
+    app.use('/api/auth', authRoutes);
+    // app.use('/api/slots', slotRoutes); // REMOVED: Using client-side slot generation
+    // app.use('/api/dynamic-slots', dynamicSlotRoutes); // REMOVED: Using client-side slot generation
+    app.use('/api/availability', availabilityRoutes);
+    app.use('/api/hospital-schedules', hospitalSchedulesRoutes);
+    // app.use('/api/gomoti-slots', gomotiSlotRoutes); // REMOVED: Using client-side slot generation
+
+    // Health check endpoint with capacity info
+    app.get('/api/health', (req, res) => {
+      res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        capacity_config: {
+          'Gomoti Hospital': 25,
+          'Moon Hospital': 25,
+          'Al-Sefa Hospital': 25
+        },
+        features: {
+          client_side_slots: true,
+          capacity_validation: true,
+          race_condition_protection: true,
+          real_time_availability: true
+        }
+      });
+    });
+
+    // Capacity configuration endpoint
+    app.get('/api/capacity-config', (req, res) => {
+      res.json({
+        hospital_capacities: {
+          'Gomoti Hospital': { maxPerSlot: 25, hospital_id: 'gomoti' },
+          'Moon Hospital': { maxPerSlot: 25, hospital_id: 'moon' },
+          'Al-Sefa Hospital': { maxPerSlot: 25, hospital_id: 'alsefa' }
+        },
+        default_capacity: 25,
+        last_updated: new Date().toISOString(),
+        version: '2.0.0-enhanced'
+      });
+    });
+
+    // CORS test endpoint
+    app.get('/api/cors-test', (req, res) => {
+      res.json({ 
+        message: 'CORS is working!',
+        origin: req.headers.origin,
+        userAgent: req.headers['user-agent'],
+        timestamp: new Date().toISOString(),
+        allowedOrigins: allowedOrigins
+      });
+    });
+
+    // Error handling middleware
+    app.use((err, req, res, next) => {
+      console.error(err.stack);
+      res.status(500).json({ 
+        error: 'Something went wrong!',
+        message: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
+    });
+
+    // 404 handler
+    app.use('*', (req, res) => {
+      res.status(404).json({ error: 'Route not found' });
+    });
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📱 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+      console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
     });
     
-    if (isAllowed) {
-      console.log(`✅ CORS allowed for origin: ${origin}`);
-      callback(null, true);
-    } else {
-      console.warn(`❌ CORS blocked origin: ${origin}`);
-      console.warn(`📋 Allowed origins:`, allowedOrigins);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  optionsSuccessStatus: 200 // For legacy browser support
-}));
+  } catch (error) {
+    console.error('❌ Failed to initialize server:', error);
+    process.exit(1);
+  }
+}
 
-// Logging
-app.use(morgan('combined'));
-
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Static files (for uploads)
-app.use('/uploads', express.static('uploads'));
-
-// API Routes
-app.use('/api/appointments', appointmentRoutes);
-app.use('/api/content', contentRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/auth', authRoutes);
-// app.use('/api/slots', slotRoutes); // REMOVED: Using client-side slot generation
-// app.use('/api/dynamic-slots', dynamicSlotRoutes); // REMOVED: Using client-side slot generation
-app.use('/api/availability', availabilityRoutes);
-app.use('/api/hospital-schedules', hospitalSchedulesRoutes);
-// app.use('/api/gomoti-slots', gomotiSlotRoutes); // REMOVED: Using client-side slot generation
-
-// Health check endpoint with capacity info
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    capacity_config: {
-      'Gomoti Hospital': 25,
-      'Moon Hospital': 25,
-      'Al-Sefa Hospital': 25
-    },
-    features: {
-      client_side_slots: true,
-      capacity_validation: true,
-      race_condition_protection: true,
-      real_time_availability: true
-    }
-  });
-});
-
-// Capacity configuration endpoint
-app.get('/api/capacity-config', (req, res) => {
-  res.json({
-    hospital_capacities: {
-      'Gomoti Hospital': { maxPerSlot: 25, hospital_id: 'gomoti' },
-      'Moon Hospital': { maxPerSlot: 25, hospital_id: 'moon' },
-      'Al-Sefa Hospital': { maxPerSlot: 25, hospital_id: 'alsefa' }
-    },
-    default_capacity: 25,
-    last_updated: new Date().toISOString(),
-    version: '2.0.0-enhanced'
-  });
-});
-
-// CORS test endpoint
-app.get('/api/cors-test', (req, res) => {
-  res.json({ 
-    message: 'CORS is working!',
-    origin: req.headers.origin,
-    userAgent: req.headers['user-agent'],
-    timestamp: new Date().toISOString(),
-    allowedOrigins: allowedOrigins
-  });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-});
+// Initialize the server
+initializeServer();
