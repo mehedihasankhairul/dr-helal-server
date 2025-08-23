@@ -18,6 +18,7 @@ import authRoutes from './routes/auth.js';
 // import slotRoutes from './routes/slots.js'; // REMOVED: Using client-side slot generation
 // import dynamicSlotRoutes from './routes/dynamic-slots.js'; // REMOVED: Using client-side slot generation
 import availabilityRoutes from './routes/availability.js';
+import hospitalSchedulesRoutes from './routes/hospital-schedules.js';
 // import gomotiSlotRoutes from './routes/gomoti-slots.js'; // REMOVED: Using client-side slot generation
 
 // Load environment variables
@@ -43,14 +44,15 @@ app.use('/api/', limiter);
 // CORS configuration for main domain and portal subdomain
 const allowedOrigins = [
   process.env.CLIENT_URL || 'http://localhost:5173', // Local development
+  'http://localhost:5173', // Development server
+  'https://dr-helal.vercel.app', // Client URL from external context
+  'https://www.dr-helal.vercel.app', // Client URL with www
   process.env.MAIN_DOMAIN || 'https://drhelal-server.vercel.app', // Main domain from env
   'https://www.drhelal-server.vercel.app', // Main domain with www
   process.env.PORTAL_DOMAIN || 'https://drhelal-server.vercel.app', // Portal subdomain from env
   'https://drhelal-server.vercel.app', // Portal subdomain (hardcoded backup)
-  'https://drhelal-server.vercel.app', // Main domain (hardcoded backup)
   'http://localhost:3000', // Alternative local port
   'http://localhost:5174', // Alternative local port
-  'http://localhost:5173', // Vite default port
 ];
 
 // If in development, allow all localhost origins
@@ -115,6 +117,7 @@ app.use('/api/auth', authRoutes);
 // app.use('/api/slots', slotRoutes); // REMOVED: Using client-side slot generation
 // app.use('/api/dynamic-slots', dynamicSlotRoutes); // REMOVED: Using client-side slot generation
 app.use('/api/availability', availabilityRoutes);
+app.use('/api/hospital-schedules', hospitalSchedulesRoutes);
 // app.use('/api/gomoti-slots', gomotiSlotRoutes); // REMOVED: Using client-side slot generation
 
 // Health check endpoint with capacity info

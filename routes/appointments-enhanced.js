@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { getCollection, toObjectId, generateObjectId } from '../config/database.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 import { generateReferenceNumber } from '../utils/helpers.js';
@@ -24,7 +25,7 @@ function getHospitalCapacity(hospital) {
 
 // Enhanced appointment booking with capacity validation and race condition protection
 router.post('/', async (req, res) => {
-    const session = await getCollection('appointments').db.startSession();
+    const session = await mongoose.startSession();
     
     try {
         const { date, appointment_date, appointment_time, hospital } = req.body;
