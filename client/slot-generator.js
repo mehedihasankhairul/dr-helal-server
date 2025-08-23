@@ -65,6 +65,65 @@ const HOSPITAL_SCHEDULES = {
     maxPerSlot: 15,
     advanceBookingDays: 60,
     doctorName: "Dr. Helal"
+  },
+  moon: {
+    id: "moon",
+    name: "Moon Hospital",
+    schedule: {
+      // Days: 0=Sunday, 1=Monday, ..., 6=Saturday (all except Friday)
+      0: { // Sunday: 3:00 PM - 5:00 PM
+        name: "Sunday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "sun-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "sun-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      },
+      1: { // Monday: 3:00 PM - 5:00 PM
+        name: "Monday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "mon-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "mon-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      },
+      2: { // Tuesday: 3:00 PM - 5:00 PM
+        name: "Tuesday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "tue-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "tue-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      },
+      3: { // Wednesday: 3:00 PM - 5:00 PM
+        name: "Wednesday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "wed-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "wed-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      },
+      4: { // Thursday: 3:00 PM - 5:00 PM
+        name: "Thursday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "thu-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "thu-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      },
+      6: { // Saturday: 3:00 PM - 5:00 PM
+        name: "Saturday",
+        timeRange: "03:00 PM - 05:00 PM",
+        slots: [
+          { id: "sat-1", start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+          { id: "sat-2", start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" }
+        ]
+      }
+      // Friday (5) intentionally missing = CLOSED
+    },
+    maxPerSlot: 20,
+    advanceBookingDays: 60,
+    doctorName: "Dr. Helal"
   }
   // Add more hospitals here as needed
 };

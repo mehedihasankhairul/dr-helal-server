@@ -45,7 +45,12 @@ const slotSchema = new mongoose.Schema({
   appointment_ids: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Appointment'
-  }]
+  }],
+  day_type: {
+    type: String,
+    enum: ['regular', 'thursday', 'special'],
+    default: 'regular'
+  }
 }, {
   timestamps: true,
   toJSON: {

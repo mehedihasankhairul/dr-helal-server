@@ -10,14 +10,15 @@ import dotenv from 'dotenv';
 import connectDB from './config/database.js';
 
 // Import routes
-import appointmentRoutes from './routes/appointments.js';
+import appointmentRoutes from './routes/appointments-enhanced.js'; // Updated to use enhanced appointments with 25-slot capacity
 import contentRoutes from './routes/content-mongo.js';
 import contactRoutes from './routes/contact.js';
 import reviewRoutes from './routes/reviews.js';
 import authRoutes from './routes/auth.js';
-import slotRoutes from './routes/slots.js';
-import dynamicSlotRoutes from './routes/dynamic-slots.js';
+// import slotRoutes from './routes/slots.js'; // REMOVED: Using client-side slot generation
+// import dynamicSlotRoutes from './routes/dynamic-slots.js'; // REMOVED: Using client-side slot generation
 import availabilityRoutes from './routes/availability.js';
+// import gomotiSlotRoutes from './routes/gomoti-slots.js'; // REMOVED: Using client-side slot generation
 
 // Load environment variables
 dotenv.config();
@@ -111,16 +112,42 @@ app.use('/api/content', contentRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/slots', slotRoutes);
-app.use('/api/dynamic-slots', dynamicSlotRoutes);
+// app.use('/api/slots', slotRoutes); // REMOVED: Using client-side slot generation
+// app.use('/api/dynamic-slots', dynamicSlotRoutes); // REMOVED: Using client-side slot generation
 app.use('/api/availability', availabilityRoutes);
+// app.use('/api/gomoti-slots', gomotiSlotRoutes); // REMOVED: Using client-side slot generation
 
-// Health check endpoint
+// Health check endpoint with capacity info
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    uptime: process.uptime() 
+    uptime: process.uptime(),
+    capacity_config: {
+      'Gomoti Hospital': 25,
+      'Moon Hospital': 25,
+      'Al-Sefa Hospital': 25
+    },
+    features: {
+      client_side_slots: true,
+      capacity_validation: true,
+      race_condition_protection: true,
+      real_time_availability: true
+    }
+  });
+});
+
+// Capacity configuration endpoint
+app.get('/api/capacity-config', (req, res) => {
+  res.json({
+    hospital_capacities: {
+      'Gomoti Hospital': { maxPerSlot: 25, hospital_id: 'gomoti' },
+      'Moon Hospital': { maxPerSlot: 25, hospital_id: 'moon' },
+      'Al-Sefa Hospital': { maxPerSlot: 25, hospital_id: 'alsefa' }
+    },
+    default_capacity: 25,
+    last_updated: new Date().toISOString(),
+    version: '2.0.0-enhanced'
   });
 });
 

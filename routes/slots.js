@@ -5,27 +5,29 @@ import dayjs from 'dayjs';
 
 const router = express.Router();
 
-// Hospital configurations
+// Dr. Helal Hospital configurations
 const hospitals = [
   {
-    id: "moon",
-    name: "Moon Hospital", 
-    visitDays: [0, 1, 2, 3, 4, 6], // Saturday to Thursday (0=Sunday, 6=Saturday)
-    timeSlots: [
-      { start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
-      { start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" },
-    ]
-  },
-  {
-    id: "popular", 
+    id: "popular",
     name: "Popular Diagnostic Centre",
-    visitDays: [0, 1, 2, 3, 4, 6], // Saturday to Thursday (0=Sunday, 6=Saturday)
+    visitDays: [0, 1, 2, 3, 4, 6], // All days except Friday (0=Sunday, 6=Saturday)
     timeSlots: [
       { start: "08:00", end: "09:00", display: "08:00 AM - 09:00 AM" },
       { start: "17:00", end: "18:00", display: "05:00 PM - 06:00 PM" },
       { start: "18:00", end: "19:00", display: "06:00 PM - 07:00 PM" },
       { start: "19:00", end: "20:00", display: "07:00 PM - 08:00 PM" },
-    ]
+    ],
+    maxAppointments: 20
+  },
+  {
+    id: "moon",
+    name: "Moon Hospital",
+    visitDays: [0, 1, 2, 3, 4, 6], // All days except Friday (0=Sunday, 6=Saturday)
+    timeSlots: [
+      { start: "15:00", end: "16:00", display: "03:00 PM - 04:00 PM" },
+      { start: "16:00", end: "17:00", display: "04:00 PM - 05:00 PM" },
+    ],
+    maxAppointments: 20
   }
 ];
 
@@ -207,7 +209,7 @@ async function initializeSlotsForDate(hospital, date) {
       time_slot: slot.display,
       start_time: slot.start,
       end_time: slot.end,
-      max_appointments: 20,
+      max_appointments: hospital.maxAppointments || 20,
       current_appointments: 0,
       is_available: true,
       appointment_ids: []
