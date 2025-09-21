@@ -52,14 +52,18 @@ async function initializeServer() {
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:5173', // Local development
       'http://localhost:5173', // Development server
+      'http://localhost:5174', // Alternative local port
+      'http://localhost:3000', // Alternative local port
       'https://dr-helal.vercel.app', // Client URL from external context
       'https://www.dr-helal.vercel.app', // Client URL with www
       process.env.MAIN_DOMAIN || 'https://drhelal-server.vercel.app', // Main domain from env
       'https://www.drhelal-server.vercel.app', // Main domain with www
-      process.env.PORTAL_DOMAIN || 'https://drhelal-server.vercel.app', // Portal subdomain from env
-      'https://drhelal-server.vercel.app', // Portal subdomain (hardcoded backup)
-      'http://localhost:3000', // Alternative local port
-      'http://localhost:5174', // Alternative local port
+      'https://drhelal-server.vercel.app', // Main domain (hardcoded backup)
+      process.env.PORTAL_DOMAIN || 'https://portal.drhelalahmed.com', // Portal subdomain from env
+      'https://portal.drhelalahmed.com', // Portal subdomain - THIS IS THE FIX!
+      'https://drhelalahmed.com', // Main domain
+      'https://www.drhelalahmed.com', // Main domain with www
+      'https://server.drhelalahmed.com', // API domain
     ];
 
     // If in development, allow all localhost origins
