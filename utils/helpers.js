@@ -3,30 +3,28 @@ import dayjs from 'dayjs';
 
 /**
  * Generate a unique reference number for appointments and prescriptions
- * Format: YYYY-MMDD-XXXX-YYYY
- * Where YYYY = year, MMDD = month+day, XXXX = random 4 digit, YYYY = sequential 4 digit
+ * Format: AYYXXXXX (8 characters)
+ * Where A = type (A for appointment, R for prescription), YY = 2-digit year, XXXXX = random base36 string
  */
 export const generateReferenceNumber = (type = 'APT') => {
   const now = dayjs();
-  const year = now.format('YYYY');
-  const monthDay = now.format('MMDD');
+  const year = now.format('YY'); // 2-digit year
   
-  // Generate random 4-digit number
-  const random = crypto.randomInt(1000, 9999);
+  // Generate random base36 string (5 characters using 0-9 and A-Z)
+  // Using crypto.randomInt(0, 60466176) to get 5 base36 characters
+  const randomPart = crypto.randomInt(0, 60466176).toString(36).toUpperCase().padStart(5, '0');
   
-  // Generate timestamp-based suffix for uniqueness
-  const timestamp = now.format('HHmm');
+  const prefix = type === 'PRESCRIPTION' ? 'R' : 'A';
   
-  const prefix = type === 'PRESCRIPTION' ? 'RX' : 'APT';
-  
-  return `${prefix}-${year}-${monthDay}-${random}-${timestamp}`;
+  return `${prefix}${year}${randomPart}`;
 };
 
 /**
  * Validate reference number format
  */
 export const isValidReferenceNumber = (refNumber) => {
-  const pattern = /^(APT|RX)-\d{4}-\d{4}-\d{4}-\d{4}$/;
+  // New format: AYYXXXXX (8 characters) - A/R + 2-digit year + 5 base36 chars
+  const pattern = /^[AR]\d{2}[0-9A-Z]{5}$/;
   return pattern.test(refNumber);
 };
 
@@ -45,14 +43,16 @@ export const parseReferenceNumber = (refNumber) => {
     return null;
   }
   
-  const parts = refNumber.split('-');
+  // New format: AYYXXXXX (8 characters)
+  const typeChar = refNumber[0];
+  const year = refNumber.substring(1, 3);
+  const randomPart = refNumber.substring(3, 8);
+  
   return {
-    type: parts[0] === 'APT' ? 'appointment' : 'prescription',
-    year: parts[1],
-    month: parts[2].substring(0, 2),
-    day: parts[2].substring(2, 4),
-    random: parts[3],
-    timestamp: parts[4]
+    type: typeChar === 'A' ? 'appointment' : 'prescription',
+    year: `20${year}`, // Convert 2-digit to 4-digit year
+    randomPart: randomPart,
+    original: refNumber
   };
 };
 
